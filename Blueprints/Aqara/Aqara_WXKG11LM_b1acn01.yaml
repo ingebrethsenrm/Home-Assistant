@@ -1,0 +1,69 @@
+blueprint:
+  name: deCONZ - Aqara WXKG11LM (b1acn01) - Wireless Mini Switch
+  description: 'Automate your Aqara Wireless Mini switch.'
+  domain: automation
+  input:
+    remote:
+      name: Aquara Wireless Mini Switch
+      description: Mini Switch to use
+      selector:
+        device:
+          integration: deconz
+          manufacturer: LUMI
+          model: lumi.remote.b1acn01
+
+    remote_button_short_press:
+      name: Single press
+      description: Action to run on a single press
+      default: []
+      selector:
+        action: {}
+
+    remote_button_hold_press:
+      name: Hold
+      description: Action to run on hold
+      default: []
+      selector:
+        action: {}
+
+    remote_button_hold_release:
+      name: Release after hold
+      description: Action to run on release after hold
+      default: []
+      selector:
+        action: {}
+
+    remote_button_double_press:
+      name: Double press
+      description: Action to run on a double press
+      default: []
+      selector:
+        action: {}
+
+
+mode: parallel
+max_exceeded: silent
+trigger:
+- platform: event
+  event_type: deconz_event
+  event_data:
+    device_id: !input 'remote'
+action:
+- variables:
+    event: '{{ trigger.event.data.event }}'
+- choose:
+
+
+  - conditions:
+    - '{{ event == 1002 }}'
+    sequence: !input 'remote_button_short_press'
+  - conditions:
+    - '{{ event == 1001 }}'
+    sequence: !input 'remote_button_hold_press'
+  - conditions:
+    - '{{ event == 1003 }}'
+    sequence: !input 'remote_button_hold_release'
+  - conditions:
+    - '{{ event == 1004 }}'
+    sequence: !input 'remote_button_double_press'
+
