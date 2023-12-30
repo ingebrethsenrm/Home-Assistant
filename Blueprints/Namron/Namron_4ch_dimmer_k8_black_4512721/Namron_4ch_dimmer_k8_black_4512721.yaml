@@ -12,7 +12,7 @@ blueprint:
         device:
           integration: deconz
           manufacturer: Namron AS
-          model: '4512721'
+          model: "4512721"
 
     # ---------------------------- ROW 1 LEFT ----------------------------
     button_row1_left_single_press:
