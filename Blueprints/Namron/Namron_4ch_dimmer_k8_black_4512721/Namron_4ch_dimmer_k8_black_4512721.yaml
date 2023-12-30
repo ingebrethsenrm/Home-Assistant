@@ -10,7 +10,7 @@ blueprint:
         device:
           integration: deconz
           manufacturer: Namron AS
-          model: lumi.remote.b686opcn01
+          model: 4512721
 
     # ---------------------------- ROW 1 LEFT ----------------------------
     button_row1_left_single_press:
