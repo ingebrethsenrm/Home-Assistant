@@ -1,8 +1,6 @@
 blueprint:
   name: deCONZ - Namron - 4512721 - 4 channel switch
-  description: |
-    Controll lights and other with Namron zigbee remote 4512721, 4 channels, 8 buttons.
-
+  description: 'Controll lights and other with Namron zigbee remote 4512721, 4 channels, 8 buttons.'
   domain: automation
   input:
     remote:
