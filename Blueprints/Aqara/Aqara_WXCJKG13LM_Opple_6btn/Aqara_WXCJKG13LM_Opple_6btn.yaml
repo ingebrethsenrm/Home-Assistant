@@ -1,5 +1,5 @@
 blueprint:
-  name: deCONZ - Aqara Opple - Wireless Scene Switch 6 Button
+  name: deCONZ - Aqara WXCJKG13LM Opple - Wireless Scene Switch 6 Button
   description: 'Control anything using Aqara Opple six button remote'
   domain: automation
   input:
