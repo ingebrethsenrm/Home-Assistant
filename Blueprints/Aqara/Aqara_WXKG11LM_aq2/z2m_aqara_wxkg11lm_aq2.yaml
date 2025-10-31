@@ -1,64 +1,66 @@
 blueprint:
-  name: Zigbee2MQTT - Aqara WXKG11LM (aq2) - 1 button
+  name: Zigbee2MQTT - Aqara WXKG11LM (aq2) - Single Button
   description: >
-    Variant for Zigbee2MQTT av Aqara WXKG11LM (aq2) enkel knapp.
-    Lytter på sensorens 'action' (sensor.<friendly_name>_action) og mapper
-    single/double/triple/quadruple/many/hold/release til egne handlinger.
+    Blueprint for Aqara WXKG11LM (aq2) single-button switch using Zigbee2MQTT.
+    It listens to the `sensor.<friendly_name>_action` entity and maps
+    actions such as single, double, triple, quadruple, many, hold, and release
+    to custom automations.
 
-    Tips:
-    - I Zigbee2MQTT bør enheten ha et friendly_name. HA lager da vanligvis entiteten
-      sensor.<friendly_name>_action (Device class: none, Unit: none).
-    - Hvis du ikke ser 'action'-sensoren, sørg for at enheten er oppdatert i Z2M
-      og at 'expose: action' vises på device-siden i Z2M.
+    🛈 Notes:
+    - The device must expose the `action` entity in Zigbee2MQTT.
+    - In Home Assistant, this usually appears as `sensor.<friendly_name>_action`.
+    - If the entity is missing, check that your device is updated and exposes
+      `action` under "Exposes" in Zigbee2MQTT.
   domain: automation
   source_url: https://github.com/ingebrethsenrm/Home-Assistant
   input:
     action_entity:
-      name: Action-sensor (Z2M)
-      description: Velg sensor som heter noe ala sensor.<friendly_name>_action
+      name: Action Sensor (Z2M)
+      description: Select the entity called something like sensor.<friendly_name>_action
       selector:
         entity:
           domain: sensor
-    # Handlinger
+
+    # Actions
     single_action:
-      name: Single
-      description: Kjør ved enkeltklikk
+      name: Single Press
+      description: Triggered when the button is pressed once
       default: []
       selector:
         action: {}
     double_action:
-      name: Double
-      description: Kjør ved dobbeltklikk
+      name: Double Press
+      description: Triggered when the button is pressed twice
       default: []
       selector:
         action: {}
     triple_action:
-      name: Triple
-      description: Kjør ved trippelklikk
+      name: Triple Press
+      description: Triggered when the button is pressed three times
       default: []
       selector:
         action: {}
     quadruple_action:
-      name: Quadruple
-      description: Kjør ved 4 klikk
+      name: Quadruple Press
+      description: Triggered when the button is pressed four times
       default: []
       selector:
         action: {}
     many_action:
-      name: Many (5+ raske klikk)
-      description: Kjør ved 'many'
+      name: Many Presses (5+)
+      description: Triggered when the button is pressed multiple times rapidly
       default: []
       selector:
         action: {}
     hold_action:
-      name: Hold (trykk og hold)
-      description: Kjør ved hold
+      name: Hold
+      description: Triggered when the button is held down
       default: []
       selector:
         action: {}
     release_action:
-      name: Release (slipp etter hold)
-      description: Kjør ved release
+      name: Release
+      description: Triggered when the button is released after being held
       default: []
       selector:
         action: {}
@@ -73,7 +75,6 @@ trigger:
   - platform: state
     entity_id: !input action_entity
 
-# Ingen globale conditions – vi håndterer alt i choose
 action:
   - variables:
       z2m_action: "{{ trigger.to_state.state | lower }}"
