@@ -1,0 +1,235 @@
+blueprint:
+  name: Zigbee2MQTT - Namron 4512721 - 4 channel switch (Z2M 2.6 compatible)
+  description: >
+    Control with Namron 4512721 (K8) via Zigbee2MQTT. Works with legacy action sensor
+    OR directly via MQTT topic. One common Hold release per row (Z2M sends brightness_stop_lX).
+  domain: automation
+
+  input:
+    # EITHER: pick the action sensor entity (if "legacy action sensors" is enabled)...
+    action_entity:
+      name: Zigbee2MQTT action entity (optional)
+      description: sensor.* entity that reports actions (e.g. sensor.namron_4512721_action)
+      default: null
+      selector:
+        entity:
+          domain: sensor
+
+    # ...OR: provide the MQTT topic for action messages:
+    action_mqtt_topic:
+      name: Zigbee2MQTT action MQTT topic (optional)
+      description: Typically "zigbee2mqtt/<friendly_name>/action"
+      default: ""
+      selector:
+        text:
+
+    # ---------------------------- ROW 1 LEFT ----------------------------
+    button_row1_left_single_press:
+      name: Row 1 left button - Single press
+      description: Action to run on a single press of left button, row 1
+      default: []
+      selector: { action: {} }
+
+    button_row1_left_hold_in:
+      name: Row 1 left button - Hold
+      description: Action to run when row 1, left button is held in
+      default: []
+      selector: { action: {} }
+
+    # ---------------------------- ROW 1 RIGHT ----------------------------
+    button_row1_right_single_press:
+      name: Row 1 right button - Single press
+      description: Action to run on a single press of right button, row 1
+      default: []
+      selector: { action: {} }
+
+    button_row1_right_hold_in:
+      name: Row 1 right button - Hold
+      description: Action to run when row 1, right button is held in
+      default: []
+      selector: { action: {} }
+
+    # ---------------------------- ROW 1 (COMMON) ----------------------------
+    button_row1_hold_release:
+      name: Row 1 - Hold release
+      description: Action to run when row 1 hold is released (common for left/right on Z2M)
+      default: []
+      selector: { action: {} }
+
+    # ---------------------------- ROW 2 LEFT ----------------------------
+    button_row2_left_single_press:
+      name: Row 2 left button - Single press
+      description: Action to run on a single press of left button, row 2
+      default: []
+      selector: { action: {} }
+
+    button_row2_left_hold_in:
+      name: Row 2 left button - Hold
+      description: Action to run when row 2, left button is held in
+      default: []
+      selector: { action: {} }
+
+    # ---------------------------- ROW 2 RIGHT ----------------------------
+    button_row2_right_single_press:
+      name: Row 2 right button - Single press
+      description: Action to run on a single press of right button, row 2
+      default: []
+      selector: { action: {} }
+
+    button_row2_right_hold_in:
+      name: Row 2 right button - Hold
+      description: Action to run when row 2, right button is held in
+      default: []
+      selector: { action: {} }
+
+    # ---------------------------- ROW 2 (COMMON) ----------------------------
+    button_row2_hold_release:
+      name: Row 2 - Hold release
+      description: Action to run when row 2 hold is released (common for left/right on Z2M)
+      default: []
+      selector: { action: {} }
+
+    # ---------------------------- ROW 3 LEFT ----------------------------
+    button_row3_left_single_press:
+      name: Row 3 left button - Single press
+      description: Action to run on a single press of left button, row 3
+      default: []
+      selector: { action: {} }
+
+    button_row3_left_hold_in:
+      name: Row 3 left button - Hold
+      description: Action to run when row 3, left button is held in
+      default: []
+      selector: { action: {} }
+
+    # ---------------------------- ROW 3 RIGHT ----------------------------
+    button_row3_right_single_press:
+      name: Row 3 right button - Single press
+      description: Action to run on a single press of right button, row 3
+      default: []
+      selector: { action: {} }
+
+    button_row3_right_hold_in:
+      name: Row 3 right button - Hold
+      description: Action to run when row 3, right button is held in
+      default: []
+      selector: { action: {} }
+
+    # ---------------------------- ROW 3 (COMMON) ----------------------------
+    button_row3_hold_release:
+      name: Row 3 - Hold release
+      description: Action to run when row 3 hold is released (common for left/right on Z2M)
+      default: []
+      selector: { action: {} }
+
+    # ---------------------------- ROW 4 LEFT ----------------------------
+    button_row4_left_single_press:
+      name: Row 4 left button - Single press
+      description: Action to run on a single press of left button, row 4
+      default: []
+      selector: { action: {} }
+
+    button_row4_left_hold_in:
+      name: Row 4 left button - Hold
+      description: Action to run when row 4, left button is held in
+      default: []
+      selector: { action: {} }
+
+    # ---------------------------- ROW 4 RIGHT ----------------------------
+    button_row4_right_single_press:
+      name: Row 4 right button - Single press
+      description: Action to run on a single press of right button, row 4
+      default: []
+      selector: { action: {} }
+
+    button_row4_right_hold_in:
+      name: Row 4 right button - Hold
+      description: Action to run when row 4, right button is held in
+      default: []
+      selector: { action: {} }
+
+    # ---------------------------- ROW 4 (COMMON) ----------------------------
+    button_row4_hold_release:
+      name: Row 4 - Hold release
+      description: Action to run when row 4 hold is released (common for left/right on Z2M)
+      default: []
+      selector: { action: {} }
+
+mode: restart
+max_exceeded: silent
+
+# Two optional triggers: state (entity) OR mqtt (topic)
+trigger:
+  - platform: state
+    id: entity
+    entity_id: !input action_entity
+    enabled: "{{ iif((action_entity|default('')) != '', true, false) }}"
+
+  - platform: mqtt
+    id: mqtt
+    topic: !input action_mqtt_topic
+    enabled: "{{ iif((action_mqtt_topic|default('')) != '', true, false) }}"
+
+variables:
+  trig_id: "{{ trigger.id if trigger is defined else 'none' }}"
+  z2m_action: >
+    {% if trig_id == 'entity' %}{{ trigger.to_state.state }}
+    {% elif trig_id == 'mqtt' %}{{ trigger.payload }}
+    {% else %}unknown{% endif %}
+
+# Mapping per Z2M docs:
+# Row X left single  -> on_lX
+# Row X right single -> off_lX
+# Row X left hold    -> brightness_move_up_lX
+# Row X right hold   -> brightness_move_down_lX
+# Row X hold release -> brightness_stop_lX
+
+action:
+  - choose:
+      # ---------------------------- ROW 1 ----------------------------
+      - conditions: "{{ z2m_action == 'on_l1' }}"
+        sequence: !input button_row1_left_single_press
+      - conditions: "{{ z2m_action == 'off_l1' }}"
+        sequence: !input button_row1_right_single_press
+      - conditions: "{{ z2m_action == 'brightness_move_up_l1' }}"
+        sequence: !input button_row1_left_hold_in
+      - conditions: "{{ z2m_action == 'brightness_move_down_l1' }}"
+        sequence: !input button_row1_right_hold_in
+      - conditions: "{{ z2m_action == 'brightness_stop_l1' }}"
+        sequence: !input button_row1_hold_release
+
+      # ---------------------------- ROW 2 ----------------------------
+      - conditions: "{{ z2m_action == 'on_l2' }}"
+        sequence: !input button_row2_left_single_press
+      - conditions: "{{ z2m_action == 'off_l2' }}"
+        sequence: !input button_row2_right_single_press
+      - conditions: "{{ z2m_action == 'brightness_move_up_l2' }}"
+        sequence: !input button_row2_left_hold_in
+      - conditions: "{{ z2m_action == 'brightness_move_down_l2' }}"
+        sequence: !input button_row2_right_hold_in
+      - conditions: "{{ z2m_action == 'brightness_stop_l2' }}"
+        sequence: !input button_row2_hold_release
+
+      # ---------------------------- ROW 3 ----------------------------
+      - conditions: "{{ z2m_action == 'on_l3' }}"
+        sequence: !input button_row3_left_single_press
+      - conditions: "{{ z2m_action == 'off_l3' }}"
+        sequence: !input button_row3_right_single_press
+      - conditions: "{{ z2m_action == 'brightness_move_up_l3' }}"
+        sequence: !input button_row3_left_hold_in
+      - conditions: "{{ z2m_action == 'brightness_move_down_l3' }}"
+        sequence: !input button_row3_right_hold_in
+      - conditions: "{{ z2m_action == 'brightness_stop_l3' }}"
+        sequence: !input button_row3_hold_release
+
+      # ---------------------------- ROW 4 ----------------------------
+      - conditions: "{{ z2m_action == 'on_l4' }}"
+        sequence: !input button_row4_left_single_press
+      - conditions: "{{ z2m_action == 'off_l4' }}"
+        sequence: !input button_row4_right_single_press
+      - conditions: "{{ z2m_action == 'brightness_move_up_l4' }}"
+        sequence: !input button_row4_left_hold_in
+      - conditions: "{{ z2m_action == 'brightness_move_down_l4' }}"
+        sequence: !input button_row4_right_hold_in
+      - conditions: "{{ z2m_action == 'brightness_stop_l4' }}"
+        sequence: !input button_row4_hold_release
