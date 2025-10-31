@@ -1,0 +1,95 @@
+blueprint:
+  name: Zigbee2MQTT - Aqara WXKG11LM (aq2) - 1 button
+  description: >
+    Variant for Zigbee2MQTT av Aqara WXKG11LM (aq2) enkel knapp.
+    Lytter på sensorens 'action' (sensor.<friendly_name>_action) og mapper
+    single/double/triple/quadruple/many/hold/release til egne handlinger.
+
+    Tips:
+    - I Zigbee2MQTT bør enheten ha et friendly_name. HA lager da vanligvis entiteten
+      sensor.<friendly_name>_action (Device class: none, Unit: none).
+    - Hvis du ikke ser 'action'-sensoren, sørg for at enheten er oppdatert i Z2M
+      og at 'expose: action' vises på device-siden i Z2M.
+  domain: automation
+  source_url: https://github.com/ingebrethsenrm/Home-Assistant
+  input:
+    action_entity:
+      name: Action-sensor (Z2M)
+      description: Velg sensor som heter noe ala sensor.<friendly_name>_action
+      selector:
+        entity:
+          domain: sensor
+    # Handlinger
+    single_action:
+      name: Single
+      description: Kjør ved enkeltklikk
+      default: []
+      selector:
+        action: {}
+    double_action:
+      name: Double
+      description: Kjør ved dobbeltklikk
+      default: []
+      selector:
+        action: {}
+    triple_action:
+      name: Triple
+      description: Kjør ved trippelklikk
+      default: []
+      selector:
+        action: {}
+    quadruple_action:
+      name: Quadruple
+      description: Kjør ved 4 klikk
+      default: []
+      selector:
+        action: {}
+    many_action:
+      name: Many (5+ raske klikk)
+      description: Kjør ved 'many'
+      default: []
+      selector:
+        action: {}
+    hold_action:
+      name: Hold (trykk og hold)
+      description: Kjør ved hold
+      default: []
+      selector:
+        action: {}
+    release_action:
+      name: Release (slipp etter hold)
+      description: Kjør ved release
+      default: []
+      selector:
+        action: {}
+
+mode: restart
+max_exceeded: silent
+
+variables:
+  action_entity: !input action_entity
+
+trigger:
+  - platform: state
+    entity_id: !input action_entity
+
+# Ingen globale conditions – vi håndterer alt i choose
+action:
+  - variables:
+      z2m_action: "{{ trigger.to_state.state | lower }}"
+  - choose:
+      - conditions: "{{ z2m_action == 'single' }}"
+        sequence: !input single_action
+      - conditions: "{{ z2m_action == 'double' }}"
+        sequence: !input double_action
+      - conditions: "{{ z2m_action == 'triple' }}"
+        sequence: !input triple_action
+      - conditions: "{{ z2m_action == 'quadruple' }}"
+        sequence: !input quadruple_action
+      - conditions: "{{ z2m_action == 'many' }}"
+        sequence: !input many_action
+      - conditions: "{{ z2m_action == 'hold' }}"
+        sequence: !input hold_action
+      - conditions: "{{ z2m_action == 'release' }}"
+        sequence: !input release_action
+    default: []
